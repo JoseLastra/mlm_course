@@ -1,0 +1,143 @@
+---
+title: "MLM, exerc 12: repeated measurements Sitka spruce data"
+author: "Gerrit Gort"
+date: July 2, 2021
+output: pdf_document
+fontsize: 12pt
+geometry: margin=0.75in
+---
+
+```{r options, include=FALSE, warning=FALSE}
+options(digits=7)
+options(show.signif.stars=F)
+library(MASS)
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE, warning=FALSE, message=FALSE)
+knitr::opts_knit$set(root.dir="C:/Users/gort001/OneDrive - Wageningen University & Research/Onderwijs/PhD-courses/AdvancedStatisticsModuleMLM/course2021_MLM/data")
+```
+
+# Read data
+
+```{r}
+Sitka <- read.csv("exercise12.csv")
+Sitka$tree <- factor(Sitka$tree)
+Sitka$treat <- factor(Sitka$treat)
+head(Sitka)
+```
+
+
+# Plot of size versus time per tree split by treatment
+
+```{r, fig.width=9, fig.height=6, strip.white=TRUE}
+library(nlme)
+Sitka.grp <- groupedData(size ~ time | tree, outer= ~treat, data=Sitka)
+# nice plot of size vs time
+plot(Sitka.grp, outer= ~treat, key=FALSE, aspect=0.85, layout=c(2,1), 
+     xlab=list(fontsize=20), ylab=list(fontsize=20), scales=list(cex=1.25))
+```
+
+# Fitting different covariance structures
+
+## 1: Compound symmetry: constant correlation among observations from same tree
+```{r}
+(lme.tree1 <- gls(size ~ treat + time + treat:time, correlation =  corCompSymm(form = ~ 1 | tree), data=Sitka) ) 
+summary(lme.tree1)
+logLik(lme.tree1)
+AIC(lme.tree1)
+
+# Different specification of same model
+(lme.tree1.1 <- lme(size ~ treat + time + treat:time, random= ~ 1  | tree, data=Sitka) ) 
+summary(lme.tree1.1)
+logLik(lme.tree1.1)
+AIC(lme.tree1.1)
+```
+## 2: AR(1): autocorrelation order 1
+```{r}
+(lme.tree2 <- gls(size ~ treat + time + treat:time, 
+                  correlation = corAR1(form = ~ 1 | tree), data=Sitka) )
+summary(lme.tree2)
+logLik(lme.tree2)
+AIC(lme.tree2)
+```
+## 3: Unstructured covariance matrix
+
+a. unstructured covariance matrix with heterogeneous variances
+
+b. unstructured covariance matrix with constant variance
+
+```{r}
+(lme.tree3a <- gls(size ~ treat + time + treat:time, 
+                  correlation =  corSymm(form = ~ 1 | tree), 
+                  weights=varIdent(form= ~ 1 | time), data=Sitka) ) 
+summary(lme.tree3a)
+logLik(lme.tree3a)
+AIC(lme.tree3a)
+
+(lme.tree3b <- lme(size ~ treat + time + treat:time, 
+                  random = list(tree = pdSymm(~ 1)), data=Sitka) ) 
+summary(lme.tree3b)
+logLik(lme.tree3b)
+AIC(lme.tree3b)
+```
+## 4: random coefficient model
+```{r}
+lme.tree4 <- lme(size ~ treat + time + treat:time, random= ~ 1 + time | tree, data=Sitka)
+summary(lme.tree4)
+logLik(lme.tree4)
+AIC(lme.tree4)
+```
+
+Comparison of AIC's:
+
+- model 1 (compound symmetry): `r round(AIC(lme.tree1),1)`
+
+- model 2 (autoregressive order 1): `r round(AIC(lme.tree2),1)`
+
+- model 3a (unstructured, heterogeneous variance): `r round(AIC(lme.tree3a),1)`
+
+- model 3b (unstructured, common variance): `r round(AIC(lme.tree3b),1)`
+
+- model 4 (random coefficients): `r round(AIC(lme.tree4),1)`
+
+Notice that the unstructured covariance matrix with heterogeneous variances gives by far the lowest AIC, meaning best fitting model. This is a quite costly structure with a lot parameters, though.
+
+# Compare F-values of fixed effects
+```{r}
+anova(lme.tree1)
+anova(lme.tree2)
+anova(lme.tree3a)
+anova(lme.tree3b)
+anova(lme.tree4)
+```
+
+Notice that hypothesis test results for fixed effects do depend on the chosen covariance structure.
+
+# Extract variance covariance matrices
+```{r}
+round(getVarCov(lme.tree1),2)
+round(getVarCov(lme.tree2),2)
+round(getVarCov(lme.tree3a),2)
+round(getVarCov(lme.tree3b),2)
+
+getVarCov(lme.tree4, type="marginal")
+
+getVarCov(lme.tree4, type="random.effects")
+# This is the covariance matrix of intercepts - slopes
+```
+
+
+# To get correlation matrix do e.g.
+```{r}
+covmat3a <- getVarCov(lme.tree3a)
+std3a <- sqrt(diag(covmat3a))
+corrmat3a <- diag(1/std3a) %*% covmat3a %*% diag(1/std3a)
+round(corrmat3a,2)
+
+# Do the same for the other 4 covariance matrices...
+```
+
+Notice the rather unexpected pattern for the unstructured correlation matrix: correlation decreases until the third timepoint, but then increases again.
+
+This may be related to a failing systematic part of the model. In the starting plot in this report clearly curved relationships can be seen. You could try to add a quadratic effect of time and next refit the models with the different covariance structures.
+
+Try yourself...
