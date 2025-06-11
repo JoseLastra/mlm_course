@@ -1,8 +1,8 @@
 # Balanced two-way ANOVA
 
 # a: read cattle.dat
-setwd("M:/LM/data")  # Change to whatever path you use yourself
-cb <- read.table("cattle-balanced.dat", col.names=c("feed","bull","wgtgain"), colClasses=c("factor","factor","numeric"))   # This reads in a raw ASCII datafile; column names are specified
+#setwd("M:/LM/data")  # Change to whatever path you use yourself
+cb <- read.table("day_1/data/cattle-balanced.dat", col.names=c("feed","bull","wgtgain"), colClasses=c("factor","factor","numeric"))   # This reads in a raw ASCII datafile; column names are specified
 cb
 
 # b: ordinary means per feed-bull combination
@@ -10,16 +10,16 @@ tapply(cb$wgtgain, list(cb$feed, cb$bull), mean)
 
 # c: two-way anova with interaction
 cb.lm <- lm(wgtgain ~ feed + bull + feed:bull, data=cb)
-summary(cb.lm)
+summary(cb.lm) # 
 anova(cb.lm)
 
 # type II and type III SS in package car
 library(car)
-
+# Type II SS is default in car package
 Anova(cb.lm, type="II")
 
 cb.lm.type3 <- lm(wgtgain ~ feed + bull + feed:bull, contrasts=list(feed=contr.sum, bull=contr.sum), data=cb)
-# Note: for type III SS sum-to-zero contrasts are needed!
+# Note: for type III SS sum-to-zero contrasts are needed! the sums to zero contrasts are specified in the contrasts argument of the lm() function.
 Anova(cb.lm.type3, type="III") 
 
 

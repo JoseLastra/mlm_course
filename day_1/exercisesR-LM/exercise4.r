@@ -10,8 +10,11 @@ twosamp <- read.table("day_1/data/lime2.dat", col.names=c("lime", "ph"))
 
 # "-1" removes the intercept from model
 lmo1 <- lm(ph ~ -1 + x1 + x2, data=twosamp)
-coef(lmo1)
+coef(lmo1) #group of means
 
 lmo2 <- lm(ph ~ x1, data=twosamp )
-coef(lmo2)
+coef(lmo2) #group of means, but with intercept which is the mean of the first group (without lime)
 
+# compare coefficients
+summary(lmo1)
+summary(lmo2)

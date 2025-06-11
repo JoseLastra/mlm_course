@@ -2,7 +2,7 @@
 
 # a Read data
 setwd("M:/LM/data")  # Change to whatever path you use yourself
-limedata <- read.table("lime.prn", header=T)    # This reads in a raw ASCII datafile; column names are given on first line of datafile
+limedata <- read.table("day_1/data/lime.prn", header=T)    # This reads in a raw ASCII datafile; column names are given on first line of datafile
 
 limeGL <- limedata[limedata$lime=="GL",]
 limeGL$ratef <- as.factor(limeGL$rate)  # Treat rate as factor = qualitative regressor
@@ -10,8 +10,8 @@ limeGL
 
 # b One-way ANOVA
 limeGL.oneway <- lm(pH ~ ratef, data=limeGL)
-anova(limeGL.oneway)
-summary(limeGL.oneway)
+anova(limeGL.oneway) # anova show differences in means between groups
+summary(limeGL.oneway) #std error is the same because we assume equal variances in groups 
 
 # c Check assumptions
 par(mfrow=c(2,2))
@@ -22,7 +22,8 @@ par(mfrow=c(1,1))
 
 # if needed, install the package: install.packages("car")
 library(car)
-leveneTest(limeGL$pH ~ limeGL$ratef)  # Levene's test for equality of variances
+leveneTest(limeGL$pH ~ limeGL$ratef)  # Levene's test for equality of variances 
+# 
 
 # d Calculate means and emmeans
 
@@ -81,3 +82,4 @@ contr <- rbind("1-2" = c(1,-1,0,0,0),
                "4-5" = c(0,0,0,1,-1))
 lsd <- glht(limeGL.oneway, linfct = mcp(ratef= contr))
 summary(lsd)
+

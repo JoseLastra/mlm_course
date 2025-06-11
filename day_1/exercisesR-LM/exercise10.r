@@ -2,7 +2,7 @@
 
 # a: read cattle.dat
 setwd("M:/LM/data")  # Change to whatever path you use yourself
-cattle <- read.table("cattle.dat", col.names=c("feed","bull","wgtgain"), colClasses=c("factor","factor","numeric"))   # This reads in a raw ASCII datafile; column names are specified
+cattle <- read.table("day_1/data/cattle.dat", col.names=c("feed","bull","wgtgain"), colClasses=c("factor","factor","numeric"))   # This reads in a raw ASCII datafile; column names are specified
 cattle
 
 # b
