@@ -2,7 +2,7 @@
 
 # Read data
 setwd("E:/course2015_MLM/data") # change to proper working directory, if needed
-acutirostris <- read.table("exercise11.prn", header=TRUE)
+acutirostris <- read.table("Rscripts/data/exercise11.prn", header=TRUE)
 head(acutirostris)
 
 acutirostris$y <- log(acutirostris$HandTime);  # We analyze the log of handling time;

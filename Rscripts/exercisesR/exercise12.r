@@ -2,7 +2,7 @@
 
 # Read data
 #setwd(" ") # change to proper working directory, if needed
-Sitka <- read.csv("exercise12.csv")
+Sitka <- read.csv("Rscripts/data/exercise12.csv")
 Sitka$tree <- factor(Sitka$tree)
 Sitka$treat <- factor(Sitka$treat)
 head(Sitka)
@@ -75,6 +75,7 @@ std3a <- sqrt(diag(covmat3a))
 (corrmat3a <- diag(1/std3a) %*% covmat3a %*% diag(1/std3a))
 
 # Do the same for the other 4 covariance matrices...
+
 
 
 # We forgot something.....there could be quadratic effect of time
