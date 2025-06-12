@@ -48,6 +48,7 @@ sp3 <- aov(weight ~ density + hybrid + density:hybrid + Error(block / mainplot),
 anova(sp1)
 
 anova(sp2)
+summary(sp2)
 # Notice again that no P-values are given; for that the packages lmerTest and pbkrtest are needed; skip now
 
 summary(sp3)
@@ -92,3 +93,4 @@ b <- 3  # 3 levels of sub plot factor
 (sed.density <- sqrt(2*MS.mainplot /(r * b)))
 (sed.hybrid <- sqrt(2*MS.error /(r * a)))
 # Compare values with sed's obtained by emmeans
+
