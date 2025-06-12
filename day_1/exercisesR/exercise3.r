@@ -29,17 +29,20 @@ y <- c(as.vector(t(cbind(feedA,feedB))), y)
 # use package lme4
 
 library(lme4)
+library(lmerTest)  # for p-values in summary output
 
 (mm1.1 <- lmer(y ~ feed + (1 | animal), data=all))
+
+
 summary(mm1.1)          # summary() of mixed model object
 
 #some other functions (methods) for the mer object
 anova(mm1.1)            # Notice that no P-value is given, but F-value is same as obtained with lme
 VarCorr(mm1.1)          # Notice that square root of variance components (standard deviations) are given
 print(VarCorr(mm1.1), comp=c("Variance"))  # Now variances are given
-fixef(mm1.1)
-ranef(mm1.1)
-
+fixef(mm1.1)            # estimates of fixed effects (ic = mean feedA; feedB = difference feedB-feedA)
+ranef(mm1.1)   # BLUPs of random effects for animals
+intervals(mm1.1)  # confidence intervals for fixed effects
 
 # Other often used package for mixed models:
 library(nlme)
@@ -52,7 +55,7 @@ anova(mm1.2)            # hypothesis test (F-test) for fixed effect(s)
 VarCorr(mm1.2)          # variance components   
 fixef(mm1.2)            # estimates of fixed effects (ic = mean feedA; feedB = difference feedB-feedA)
 random.effects(mm1.2)   # BLUPs of random effects for animals
-
+intervals(mm1.2)  # confidence intervals for fixed effects
 
 # Yet another way: look at the problem as linear model with correlated errors (so, bypassing the Zu part, and directly target the R matrix)
 # The function gls() of the nlme package may be used.

@@ -17,7 +17,7 @@ anova(lm3)
 summary(lm3)
 library(emmeans)  # for estimated marginal means
 emmeans(lm3, ~ line)  # estimated means mu + alpha_i
-
+# Note that this is equivalent to the following:
 tapply(barley$height, barley$line, mean)  # just ordinary means, i.e. not model-based; same here
 
 # c Random effects model using lme()
@@ -25,9 +25,9 @@ tapply(barley$height, barley$line, mean)  # just ordinary means, i.e. not model-
 library(nlme)
 (mm3 <- lme(fixed= height ~ 1, random = ~ 1 | line, data=barley))
 VarCorr(mm3) # variance components
-ranef(mm3)   # BLUPs of random effects
-fixef(mm3)   # fixed effects, here intercept only
-(pred.mm <- unlist(coef(mm3)))    # predictions of means, based on BLUPs
+ranef(mm3)   # BLUPs of random effects # for lines, i.e. deviations from overall mean
+fixef(mm3)   # fixed effects, here intercept only # (overall mean)
+(pred.mm <- unlist(coef(mm3)))    # predictions of means, based on BLUPs comparing the ordinary means with the predictions we can see a shrinkage of the extremes the amount of shrinkage depends on the variance components, i.e. how much variation there is between lines and within lines, sample size, etc.
 
 # Notice that these predictions are somewhat shrunken 
 # towards the overall mean compared to the means from fixed effects model
@@ -56,3 +56,4 @@ lm2 <- lm(height ~ line, data=barley)
 MS.L <- anova.table[1,3]   # Mean square of line
 MS.E <- anova.table[2,3]   # Mean square of error
 (vc.L <- (MS.L-MS.E)/10)   # Compare with variance component estimate from lme()
+

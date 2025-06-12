@@ -31,23 +31,28 @@ lmo1 <- lm(y ~ Sex + Feed + Sex:Feed, data=splitplot)
 anova(lmo1)
 # Compare ANOVA table with correct ANOVA table.
 # Which tests are wrong? Why are they wrong?
+# Notice that the F-tests for interaction and for Feed are correct.
 
 
 # Wrong analysis II: introduce main plots with fixed effects
 
 lmo2 <- lm(y ~ Animal + Sex + Feed + Sex:Feed, data=splitplot)
+lmo2 <- lm(y ~ Sex + Animal + Feed + Sex:Feed, data=splitplot)
 anova(lmo2) # recall: anova() produced sequential (type I) sums of squares
 # Compare ANOVA table with correct ANOVA table.
 # Why is there no F-test for main effect of Sex?
 # Can you understand why F-tests for Feed and Sex:Feed are correct?
+# Sex and animal are co-founded so you miss the sex main effect 
+# and the interaction with animal is not tested.
 
 
 # Wrong analysis III: introduce main plots as nested within animals
 
-lmo3 <- lm(y ~ Animal %in% Sex + Sex + Feed + Sex:Feed, data=splitplot)
+lmo3 <- lm(y ~ Animal %in% Sex + Sex + Feed + Sex:Feed, data=splitplot) #animal nested within sex = Animal %in% Sex 
 anova(lmo3)
 # Now we do have an F-test for the main effect of Sex.
 # But why is it wrong?
+#lm does nod identify structure and calc F statistics against geral mse
 # The F-tests for interaction and for Feed are correct.
 
 
@@ -62,6 +67,6 @@ emmeans(sp, pairwise ~ Feed, adjust="none")  # sed of feed: 0.103
 emmeans(sp, pairwise ~ Sex:Feed, adjust="none")  # sed of combinations of sex and feed; two different sed's:
  # sed is 1.13 for differences among two sexes (either with same or different feeds)
  # sed is 0.146 for differences among feed within the same sex!
-
+# differences in SDE is given by the comparison lowr values shows whithin individual comparison, while larger values show indididual + sex differences
 
 
